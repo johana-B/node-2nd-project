@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const CourseSchema = mongoose.Schema({
+const InstractorSchema = mongoose.Schema({
     firstName: {
         type: String,
         required: true,
@@ -41,5 +41,5 @@ const CourseSchema = mongoose.Schema({
     },
 }, { timestamps: true });
 
-const courseSchema = mongoose.model('course', CourseSchema);
-module.exports = courseSchema;
+const instractorSchema = mongoose.model('instractor', InstractorSchema);
+module.exports = instractorSchema;

@@ -1,4 +1,4 @@
-// const Course = require('../model/courseModel');
+const instractor = require('../model/instructorModel');
 // const { StatusCodes } = require('http-status-codes')
 // const CustomError = require('../errors')
 
