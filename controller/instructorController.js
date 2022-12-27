@@ -1,4 +1,4 @@
-const instractor = require('../model/instructorModel');
+//const instractor = require('../model/instructorModel');
 // const { StatusCodes } = require('http-status-codes')
 // const CustomError = require('../errors')
 

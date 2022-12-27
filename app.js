@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const connectDB = require('./db/connect');
 const morgan = require('morgan');
+const userRouter = require('./routes/userRoute')
 const courseRouter = require('./routes/courseRoute')
 const instractorRouter = require('./routes/InstractorRoute')
 
@@ -18,6 +19,7 @@ app.use(express.json());
 app.get('/', (req, res) => {
     res.send('e-learning API');
 });
+app.use('/user', userRouter);
 app.use('/course', courseRouter);
 app.use('/instractor', instractorRouter);
 
