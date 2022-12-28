@@ -4,7 +4,7 @@ const Router = express.Router()
 
 const {
     createInstractor,
-    getAllInstractor,
+    getAllInstractors,
     getSingleInstractor,
     updateInstractor,
     delateInstractor,
@@ -12,7 +12,7 @@ const {
 
 Router
     .route('/')
-    .get(getAllInstractor)
+    .get(getAllInstractors)
     .post(createInstractor)
 
 Router
