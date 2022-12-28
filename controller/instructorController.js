@@ -1,6 +1,6 @@
 const Instractor = require('../model/instructorModel');
 const { StatusCodes } = require('http-status-codes')
-const CustomError = require('../error')
+const CustomError = require('../errors')
 const path = require('path');
 
 const createInstractor = async (req, res) => {
