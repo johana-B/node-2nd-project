@@ -2,6 +2,7 @@ const Course = require('../model/courseModel');
 const Instractor = require('../model/instructorModel');
 const { StatusCodes } = require('http-status-codes')
 const CustomError = require('../errors')
+const path = require('path')
 
 const createCourse = async (req, res) => {
     const { instractor: instractorId } = req.body;
@@ -44,7 +45,7 @@ const updateCourse = async (req, res) => {
 
 const delateCourse = async (req, res) => {
     const { id: courseId } = req.params;
-    const course = await course.findOne({ _id: courseId });
+    const course = await Course.findOne({ _id: courseId });
     if (!course) {
         throw new CustomError.NotFoundError(`no course with id ${courseId}`)
     }
@@ -52,10 +53,47 @@ const delateCourse = async (req, res) => {
     res.status(StatusCodes.OK).json({ msg: 'course delated successfully ' });
 };
 
+const uploadVideo = async (req, res) => {
+    if (!req.files) {
+        throw new CustomError.BadRequest('No File Uploaded');
+    }
+    const courseVideo = req.files.video;
+    if (!courseVideo.mimetype.startsWith('video')) {
+        throw new CustomError.BadRequest('Please Upload video');
+    }
+    const videoPath = path.join(
+        __dirname,
+        '../public/uploads/video/' + `${courseVideo.name}`
+    );
+    await courseVideo.mv(videoPath);
+    res.status(StatusCodes.CREATED).json({ video: `/uploads/video/${courseVideo.name}` });
+};
+const uploadPdf = async (req, res) => {
+    if (!req.files) {
+        throw new CustomError.BadRequest('No File Uploaded');
+    }
+    const { id: courseId } = req.params;
+    const course = await Course.findOne({ _id: courseId });
+    if (!course) {
+        throw new CustomError.NotFoundError(`no course with id ${courseId}`)
+    }
+    const coursePdf = req.files.pdf;
+    const pdfName = coursePdf.name;
+    const pdfPath = path.join(
+        __dirname,
+        '../public/uploads/pdf/' + pdfName
+    );
+    await coursePdf.mv(pdfPath);
+    course.pdf = `/uploads/pdf/${pdfName}`
+    await course.save();
+    res.status(StatusCodes.CREATED).json({ pdf: `/uploads/pdf/${pdfName}` });
+};
 module.exports = {
     createCourse,
     getAllCourse,
     getSingleCourse,
     updateCourse,
-    delateCourse
+    delateCourse,
+    uploadVideo,
+    uploadPdf,
 }

@@ -7,14 +7,22 @@ const {
     getAllCourse,
     getSingleCourse,
     updateCourse,
-    delateCourse
+    delateCourse,
+    uploadVideo,
+    uploadPdf
 } = require('../controller/courseController');
 
 Router
     .route('/')
     .get(getAllCourse)
     .post(createCourse)
+Router
+    .route('/uploadVideo')
+    .post(uploadVideo)
 
+Router
+    .route('/uploadPdf')
+    .post(uploadPdf)
 Router
     .route('/:id')
     .get(getSingleCourse)

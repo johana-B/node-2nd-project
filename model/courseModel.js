@@ -27,6 +27,14 @@ const CourseSchema = mongoose.Schema({
         type: String,
         required: true,
     },
+    video: {
+        type: String,
+        default: '/uploads/pdf/picture-1.jpg'
+    },
+    pdf: {
+        type: String,
+        default: '/uploads/pdf/picture-1.jpg'
+    },
 }, { timestamps: true });
 
 const courseSchema = mongoose.model('course', CourseSchema);
