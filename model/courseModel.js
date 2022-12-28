@@ -7,6 +7,7 @@ const CourseSchema = mongoose.Schema({
     },
     instractor: {
         type: mongoose.Types.ObjectId,
+        ref: 'instractor',
         required: true,
     },
     duration: {
