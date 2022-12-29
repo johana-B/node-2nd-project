@@ -2,7 +2,9 @@ const Instractor = require('../model/instructorModel');
 const { StatusCodes } = require('http-status-codes')
 const CustomError = require('../errors')
 const path = require('path');
+const { attachCookiesToResponse, createTokenInstractor } = require('../utils');
 
+// instractor authentication started
 const createInstractor = async (req, res) => {
     const ext = path.extname(req.files.image.name);
     const instractorImage = req.files.image
@@ -32,9 +34,38 @@ const createInstractor = async (req, res) => {
     })
 
     const instractors = await instractor.save()
-    return res.status(StatusCodes.CREATED).json({ instractors });
+    const tokenInstractor = createTokenInstractor(instractors);
+    return res.status(StatusCodes.CREATED).json({ instractor: tokenInstractor });
 };
 
+const login = async (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+        throw new CustomError.BadRequest('email and password can not be empty');
+    };
+    const instractor = await Instractor.findOne({ email })
+    if (!instractor) {
+        throw new CustomError.NotFoundError('invalid crediential');
+    };
+    const isPasswordCorrect = await instractor.comparePassword(password);
+    if (!isPasswordCorrect) {
+        throw new CustomError.NotFoundError('invalid credential');
+    };
+    const tokeninstractor = createTokenInstractor(instractor);
+    attachCookiesToResponse({ res, instractor: tokeninstractor });
+    res.status(StatusCodes.CREATED).json({ instractor: tokeninstractor });
+};
+
+const logout = async (req, res) => {
+    res.cookie('token', 'logout', {
+        httpOnly: true,
+        expires: new Date(Date.now())
+    });
+    res.status(StatusCodes.OK).json({ msg: 'Instractor logged out!' });
+};
+// instractor authentication ended
+
+// instractor controllers by admin and it self
 const getAllInstractors = async (req, res) => {
     const instractor = await Instractor.find({}).select('-password');
     res.status(StatusCodes.OK).json({ instractor, count: instractor.length });
@@ -49,6 +80,10 @@ const getSingleInstractor = async (req, res) => {
     res.status(StatusCodes.OK).json(instractor);
 };
 
+const currentInstractor = async (req, res) => {
+    res.status(StatusCodes.OK).json({ instractor: req.instractor });
+}
+
 const updateInstractor = async (req, res) => {
     const { id: instractorId } = req.params
     const instractor = await Instractor.findByIdAndUpdate({ _id: instractorId }, req.body, {
@@ -58,7 +93,9 @@ const updateInstractor = async (req, res) => {
     if (!instractor) {
         throw new CustomError.NotFoundError(`no instractor with id ${instractorId}`);
     }
-    res.status(StatusCodes.OK).json({ instractor, msg: 'instructor updated successfully' });
+    const tokeninstractor = createTokenInstractor(instractor);
+    attachCookiesToResponse({ res, instractor: tokeninstractor });
+    res.status(StatusCodes.CREATED).json({ instractor: tokeninstractor, msg: 'instractor updated successfully' });
 };
 
 const delateInstractor = async (req, res) => {
@@ -71,10 +108,16 @@ const delateInstractor = async (req, res) => {
     res.status(StatusCodes.OK).json({ msg: 'Instractor delated successfully ' });
 };
 
+
 module.exports = {
+    // auth
     createInstractor,
+    login,
+    logout,
+    // controller
     getAllInstractors,
     getSingleInstractor,
     updateInstractor,
     delateInstractor,
+    currentInstractor,
 }

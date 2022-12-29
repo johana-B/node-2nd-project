@@ -4,6 +4,7 @@ const path = require('path');
 const express = require('express');
 const connectDB = require('./db/connect');
 const morgan = require('morgan');
+const cookieParser = require('cookie-parser')
 const fileUpload = require('express-fileupload');
 const userRouter = require('./routes/userRoute')
 const courseRouter = require('./routes/courseRoute')
@@ -17,6 +18,7 @@ const errorHandlerMiddleware = require('./middleware/error-handler')
 const app = express();
 app.use(express.static('./public'));
 app.use(morgan('tiny'));
+app.use(cookieParser(process.env.JWT_SECRET));
 app.use(express.json());
 app.use(fileUpload({ createParentPath: true }))
 app.get('/', (req, res) => {

@@ -10,6 +10,11 @@ const CourseSchema = mongoose.Schema({
         ref: 'instractor',
         required: true,
     },
+    lectures: {
+        type: [String],
+        default: ['lecture-1'],
+        required: true,
+    },
     duration: {
         type: Number,
         required: true,

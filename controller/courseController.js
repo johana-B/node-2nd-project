@@ -5,11 +5,7 @@ const CustomError = require('../errors')
 const path = require('path')
 
 const createCourse = async (req, res) => {
-    const { instractor: instractorId } = req.body;
-    const isValidinstractor = await Instractor.findOne({ _id: instractorId });
-    if (!isValidinstractor) {
-        throw new CustomError.NotFoundError(`no instractor with id${instractorId}`);
-    }
+    req.body.instractor = req.instractor.instractorId
     const course = await Course.create(req.body);
     res.status(StatusCodes.CREATED).json({ course })
 };
@@ -61,31 +57,27 @@ const uploadVideo = async (req, res) => {
     if (!courseVideo.mimetype.startsWith('video')) {
         throw new CustomError.BadRequest('Please Upload video');
     }
+    const name = courseVideo.name
+    const videoName = name.split(' ').join('_')
     const videoPath = path.join(
         __dirname,
-        '../public/uploads/video/' + `${courseVideo.name}`
+        '../public/uploads/video/' + `${videoName}`
     );
     await courseVideo.mv(videoPath);
-    res.status(StatusCodes.CREATED).json({ video: `/uploads/video/${courseVideo.name}` });
+    res.status(StatusCodes.CREATED).json({ video: `/uploads/video/${videoName}` });
 };
 const uploadPdf = async (req, res) => {
     if (!req.files) {
         throw new CustomError.BadRequest('No File Uploaded');
     }
-    const { id: courseId } = req.params;
-    const course = await Course.findOne({ _id: courseId });
-    if (!course) {
-        throw new CustomError.NotFoundError(`no course with id ${courseId}`)
-    }
     const coursePdf = req.files.pdf;
-    const pdfName = coursePdf.name;
+    const name = coursePdf.name;
+    const pdfName = name.split(' ').join('_')
     const pdfPath = path.join(
         __dirname,
         '../public/uploads/pdf/' + pdfName
     );
     await coursePdf.mv(pdfPath);
-    course.pdf = `/uploads/pdf/${pdfName}`
-    await course.save();
     res.status(StatusCodes.CREATED).json({ pdf: `/uploads/pdf/${pdfName}` });
 };
 module.exports = {

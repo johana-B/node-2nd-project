@@ -2,6 +2,8 @@ const express = require('express')
 
 const Router = express.Router()
 
+const { authenticateInstractor, autorizedInstractor } = require('../middleware/authentication')
+
 const {
     createCourse,
     getAllCourse,
@@ -15,18 +17,18 @@ const {
 Router
     .route('/')
     .get(getAllCourse)
-    .post(createCourse)
+    .post([authenticateInstractor, autorizedInstractor('admin', 'Instractor')], createCourse)
 Router
     .route('/uploadVideo')
-    .post(uploadVideo)
+    .post([authenticateInstractor, autorizedInstractor('admin', 'Instractor')], uploadVideo)
 
 Router
     .route('/uploadPdf')
-    .post(uploadPdf)
+    .post([authenticateInstractor, autorizedInstractor('admin', 'Instractor')], uploadPdf)
 Router
     .route('/:id')
     .get(getSingleCourse)
-    .patch(updateCourse)
-    .delete(delateCourse)
+    .patch([authenticateInstractor, autorizedInstractor('admin', 'Instractor')], updateCourse)
+    .delete([authenticateInstractor, autorizedInstractor('admin', 'Instractor')], delateCourse)
 
 module.exports = Router
