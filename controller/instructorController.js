@@ -1,69 +1,7 @@
 const Instractor = require('../model/instructorModel');
 const { StatusCodes } = require('http-status-codes')
 const CustomError = require('../errors')
-const path = require('path');
-const { attachCookiesToResponse, createTokenInstractor } = require('../utils');
-
-// instractor authentication started
-const createInstractor = async (req, res) => {
-    const ext = path.extname(req.files.image.name);
-    const instractorImage = req.files.image
-    if (!instractorImage.mimetype.startsWith('image')) {
-        throw new CustomError.BadRequest('Please Upload Image');
-    }
-    const val = Date.now().toString()
-    const imageName = req.body.firstName + val + ext;
-    const fileName = imageName.split(' ').join('-')
-    const imagePath = path.join(
-        __dirname,
-        '../public/uploads/' + fileName
-    );
-    await instractorImage.mv(imagePath);
-    let instractor = new Instractor({
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        email: req.body.email,
-        password: req.body.password,
-        educationStatus: req.body.educationStatus,
-        courseToOffer: req.body.courseToOffer,
-        address: req.body.address,
-        experience: req.body.experience,
-        age: req.body.age,
-        gender: req.body.gender,
-        image: `/uploads/${fileName}`
-    })
-
-    const instractors = await instractor.save()
-    const tokenInstractor = createTokenInstractor(instractors);
-    return res.status(StatusCodes.CREATED).json({ instractor: tokenInstractor });
-};
-
-const login = async (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-        throw new CustomError.BadRequest('email and password can not be empty');
-    };
-    const instractor = await Instractor.findOne({ email })
-    if (!instractor) {
-        throw new CustomError.NotFoundError('invalid crediential');
-    };
-    const isPasswordCorrect = await instractor.comparePassword(password);
-    if (!isPasswordCorrect) {
-        throw new CustomError.NotFoundError('invalid credential');
-    };
-    const tokeninstractor = createTokenInstractor(instractor);
-    attachCookiesToResponse({ res, instractor: tokeninstractor });
-    res.status(StatusCodes.CREATED).json({ instractor: tokeninstractor });
-};
-
-const logout = async (req, res) => {
-    res.cookie('token', 'logout', {
-        httpOnly: true,
-        expires: new Date(Date.now())
-    });
-    res.status(StatusCodes.OK).json({ msg: 'Instractor logged out!' });
-};
-// instractor authentication ended
+const { attachCookiesToResponse, createTokenUser } = require('../utils');
 
 // instractor controllers by admin and it self
 const getAllInstractors = async (req, res) => {
@@ -81,7 +19,8 @@ const getSingleInstractor = async (req, res) => {
 };
 
 const currentInstractor = async (req, res) => {
-    res.status(StatusCodes.OK).json({ instractor: req.instractor });
+    console.log(req.user)
+    res.status(StatusCodes.OK).json({ instractor: req.user });
 }
 
 const updateInstractor = async (req, res) => {
@@ -93,8 +32,8 @@ const updateInstractor = async (req, res) => {
     if (!instractor) {
         throw new CustomError.NotFoundError(`no instractor with id ${instractorId}`);
     }
-    const tokeninstractor = createTokenInstractor(instractor);
-    attachCookiesToResponse({ res, instractor: tokeninstractor });
+    const tokeninstractor = createTokenUser(instractor);
+    attachCookiesToResponse({ res, user: tokeninstractor });
     res.status(StatusCodes.CREATED).json({ instractor: tokeninstractor, msg: 'instractor updated successfully' });
 };
 
@@ -108,16 +47,26 @@ const delateInstractor = async (req, res) => {
     res.status(StatusCodes.OK).json({ msg: 'Instractor delated successfully ' });
 };
 
+const updateinstractorPassword = async (req, res) => {
+    const { oldPassword, newPassword } = req.body;
+    if (!oldPassword || !newPassword) {
+        throw new CustomError.BadRequest('passwords can not be empty');
+    };
+    const user = await Instractor.findOne({ _id: req.user.userId });
+    const isPasswordCorrect = await user.comparePassword(oldPassword);
+    if (!isPasswordCorrect) {
+        throw new CustomError.NotFoundError('invalid credential');
+    }
+    user.password = newPassword
+    await user.save();
+    res.status(StatusCodes.CREATED).json({ msg: 'password changed successfully' });
+};
 
 module.exports = {
-    // auth
-    createInstractor,
-    login,
-    logout,
-    // controller
     getAllInstractors,
     getSingleInstractor,
     updateInstractor,
     delateInstractor,
+    updateinstractorPassword,
     currentInstractor,
 }

@@ -1,16 +1,22 @@
 const express = require('express');
-const Router = express.Router();
 
-const {
-    register,
-    fetchAllUser,
-    fetchCurrentId
+const router = express.Router();
+
+const { authenticateUser, autorizedUser } = require('../middleware/authentication')
+
+const { getAllUsers,
+    getCurrentUser,
+    getSingleUser,
+    updateUser,
+    updateUserPassword
 } = require('../controller/userController');
 
-Router.route('/addUser').post(register);
+router.route('/').get(authenticateUser, autorizedUser('admin'), getAllUsers);
 
-Router.route('/fetchAll').get(fetchAllUser);
+router.route('/showCurrentUser').get(authenticateUser, getCurrentUser);
+router.route('/updateUser').patch(authenticateUser, updateUser);
+router.route('/updateUserPassword').patch(authenticateUser, updateUserPassword);
 
-Router.route('/fetchCurrent/:id').get(fetchCurrentId);
+router.route('/:id').get(authenticateUser, getSingleUser);
 
-module.exports = Router
+module.exports = router;

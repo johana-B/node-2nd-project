@@ -1,41 +1,30 @@
 const express = require('express')
 
 const Router = express.Router()
-const { authenticateInstractor, autorizedInstractor } = require('../middleware/authentication')
+const { authenticateUser, autorizedUser } = require('../middleware/authentication')
 const {
-    // auth
-    createInstractor,
-    login,
-    logout,
-    // controller
     getAllInstractors,
     getSingleInstractor,
     updateInstractor,
     delateInstractor,
+    updateinstractorPassword,
     currentInstractor
 } = require('../controller/instructorController');
 
 Router
     .route('/')
-    .get([authenticateInstractor, autorizedInstractor('admin')], getAllInstractors)
-    .post([authenticateInstractor, autorizedInstractor('admin')], createInstractor)
+    .get([authenticateUser, autorizedUser('admin')], getAllInstractors)
 
 Router
-    .route('/login')
-    .post(login)
-
-Router
-    .route('/logout')
-    .get(logout)
-
+    .route('/updateInstractorPassword')
+    .patch(authenticateUser, updateinstractorPassword)
 Router
     .route('/showMe')
-    .get(authenticateInstractor, currentInstractor)
-
+    .get(authenticateUser, currentInstractor)
 Router
     .route('/:id')
-    .get([authenticateInstractor, autorizedInstractor('admin')], getSingleInstractor)
-    .delete([authenticateInstractor, autorizedInstractor('admin')], delateInstractor)
-    .patch(authenticateInstractor, updateInstractor)
+    .get([authenticateUser, autorizedUser('admin')], getSingleInstractor)
+    .delete([authenticateUser, autorizedUser('admin')], delateInstractor)
+    .patch(authenticateUser, updateInstractor)
 
 module.exports = Router

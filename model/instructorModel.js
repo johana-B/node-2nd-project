@@ -64,8 +64,8 @@ const InstractorSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['Instractor'],
-        default: 'Instractor'
+        enum: ['instractor'],
+        default: 'instractor'
     },
 }, { timestamps: true });
 

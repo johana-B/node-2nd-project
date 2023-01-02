@@ -5,7 +5,7 @@ const CustomError = require('../errors')
 const path = require('path')
 
 const createCourse = async (req, res) => {
-    req.body.instractor = req.instractor.instractorId
+    req.body.instractor = req.user.userId
     const course = await Course.create(req.body);
     res.status(StatusCodes.CREATED).json({ course })
 };

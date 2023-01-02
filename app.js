@@ -1,19 +1,20 @@
 require('dotenv').config();
 require('express-async-errors')
-const path = require('path');
+
 const express = require('express');
 const connectDB = require('./db/connect');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser')
 const fileUpload = require('express-fileupload');
-const userRouter = require('./routes/userRoute')
-const courseRouter = require('./routes/courseRoute')
-const instractorRouter = require('./routes/InstractorRoute')
+
+const authRouter = require('./routes/authRoute');
+const userRouter = require('./routes/userRoute');
+const courseRouter = require('./routes/courseRoute');
+const instractorRouter = require('./routes/InstractorRoute');
 
 //middleware
 const notFound = require('./middleware/notfound')
 const errorHandlerMiddleware = require('./middleware/error-handler')
-
 
 const app = express();
 app.use(express.static('./public'));
@@ -27,7 +28,8 @@ app.get('/', (req, res) => {
 app.use('/users', userRouter);
 app.use('/courses', courseRouter);
 app.use('/instractors', instractorRouter);
-app.use('public/uploads', express.static(path.join(__dirname, 'public', 'uploads')))
+app.use('/auth', authRouter);
+
 //middleware
 app.use(notFound);
 app.use(errorHandlerMiddleware);
