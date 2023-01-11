@@ -1,5 +1,4 @@
 const Course = require('../model/courseModel');
-const Instractor = require('../model/instructorModel');
 const { StatusCodes } = require('http-status-codes')
 const CustomError = require('../errors')
 const path = require('path')
