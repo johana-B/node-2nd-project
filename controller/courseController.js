@@ -4,8 +4,44 @@ const CustomError = require('../errors')
 const path = require('path')
 
 const createCourse = async (req, res) => {
-    req.body.instractor = req.user.userId
-    const course = await Course.create(req.body);
+    // started video upload
+    if (!req.files) {
+        throw new CustomError.BadRequest('No File Uploaded');
+    }
+    const ext = path.extname(req.files.video.name);
+    const courseVideo = req.files.video;
+    if (!courseVideo.mimetype.startsWith('video')) {
+        throw new CustomError.BadRequest('Please Upload video');
+    }
+    const videoName = req.body.courseName + ext
+    const videoPath = path.join(
+        __dirname,
+        '../public/uploads/video/' + `${videoName}`
+    );
+    await courseVideo.mv(videoPath);
+    //end video upload
+    //start pdf upload
+    const pExt = path.extname(req.files.pdf.name);
+    const coursePdf = req.files.pdf;
+    const pdfName = req.body.courseName + pExt;
+    const pdfPath = path.join(
+        __dirname,
+        '../public/uploads/pdf/' + pdfName
+    );
+    await coursePdf.mv(pdfPath);
+    // end pdf upload
+
+    const { courseName, duration, level, description, curriculum, } = req.body;
+    const course = await Course.create({
+        instractor: req.user.userId,
+        courseName,
+        duration,
+        level,
+        description,
+        curriculum,
+        video: `${videoName}`,
+        pdf: `${pdfName}`
+    });
     res.status(StatusCodes.CREATED).json({ course })
 };
 
@@ -48,43 +84,10 @@ const delateCourse = async (req, res) => {
     res.status(StatusCodes.OK).json({ msg: 'course delated successfully ' });
 };
 
-const uploadVideo = async (req, res) => {
-    if (!req.files) {
-        throw new CustomError.BadRequest('No File Uploaded');
-    }
-    const courseVideo = req.files.video;
-    if (!courseVideo.mimetype.startsWith('video')) {
-        throw new CustomError.BadRequest('Please Upload video');
-    }
-    const name = courseVideo.name
-    const videoName = name.split(' ').join('_')
-    const videoPath = path.join(
-        __dirname,
-        '../public/uploads/video/' + `${videoName}`
-    );
-    await courseVideo.mv(videoPath);
-    res.status(StatusCodes.CREATED).json({ video: `/uploads/video/${videoName}` });
-};
-const uploadPdf = async (req, res) => {
-    if (!req.files) {
-        throw new CustomError.BadRequest('No File Uploaded');
-    }
-    const coursePdf = req.files.pdf;
-    const name = coursePdf.name;
-    const pdfName = name.split(' ').join('_')
-    const pdfPath = path.join(
-        __dirname,
-        '../public/uploads/pdf/' + pdfName
-    );
-    await coursePdf.mv(pdfPath);
-    res.status(StatusCodes.CREATED).json({ pdf: `/uploads/pdf/${pdfName}` });
-};
 module.exports = {
     createCourse,
     getAllCourse,
     getSingleCourse,
     updateCourse,
     delateCourse,
-    uploadVideo,
-    uploadPdf,
 }

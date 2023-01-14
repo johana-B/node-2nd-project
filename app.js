@@ -11,7 +11,6 @@ const authRouter = require('./routes/authRoute');
 const userRouter = require('./routes/userRoute');
 const courseRouter = require('./routes/courseRoute');
 const instractorRouter = require('./routes/InstractorRoute');
-const videoRouter = require('./routes/videoStreamRoute');
 //middleware
 const notFound = require('./middleware/notfound')
 const errorHandlerMiddleware = require('./middleware/error-handler')
@@ -23,16 +22,13 @@ app.use(cookieParser(process.env.JWT_SECRET));
 app.use(express.json());
 app.use(fileUpload({ createParentPath: true }))
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
+    res.send('e-learning')
 });
-
-app.use('/video', videoRouter)
 
 app.use('/users', userRouter);
 app.use('/courses', courseRouter);
 app.use('/instractors', instractorRouter);
 app.use('/auth', authRouter);
-//app.use('/video', videoRouter);
 
 //middleware
 app.use(notFound);
