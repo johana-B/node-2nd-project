@@ -15,12 +15,12 @@ const {
 Router
     .route('/')
     .get(getAllCourse)
-    .post([authenticateUser, autorizedUser('admin', 'instractor')], createCourse,)
+    .post([authenticateUser, autorizedUser('admin', 'instractor', 'institution')], createCourse,)
 
 Router
     .route('/:id')
     .get(getSingleCourse)
-    .patch([authenticateUser, autorizedUser('admin', 'instractor')], updateCourse)
-    .delete([authenticateUser, autorizedUser('admin', 'instractor')], delateCourse)
+    .patch([authenticateUser, autorizedUser('admin', 'instractor', 'institution')], updateCourse)
+    .delete([authenticateUser, autorizedUser('admin', 'instractor', 'institution')], delateCourse)
 
 module.exports = Router

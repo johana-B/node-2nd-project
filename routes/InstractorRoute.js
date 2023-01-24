@@ -13,7 +13,7 @@ const {
 
 Router
     .route('/')
-    .get([authenticateUser, autorizedUser('admin')], getAllInstractors)
+    .get([authenticateUser, autorizedUser('admin', 'institution')], getAllInstractors)
 
 Router
     .route('/updateInstractorPassword')
@@ -23,8 +23,8 @@ Router
     .get(authenticateUser, currentInstractor)
 Router
     .route('/:id')
-    .get([authenticateUser, autorizedUser('admin')], getSingleInstractor)
-    .delete([authenticateUser, autorizedUser('admin')], delateInstractor)
+    .get([authenticateUser, autorizedUser('admin', 'institution')], getSingleInstractor)
+    .delete([authenticateUser, autorizedUser('admin', 'institution')], delateInstractor)
     .patch(authenticateUser, updateInstractor)
 
 module.exports = Router
