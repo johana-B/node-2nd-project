@@ -1,7 +1,7 @@
 const Instractor = require('../model/instructorModel');
 const { StatusCodes } = require('http-status-codes')
 const CustomError = require('../errors')
-const { attachCookiesToResponse, createTokenUser } = require('../utils');
+const { attachCookiesToResponse, createTokenUser, chechPermissions } = require('../utils');
 
 // instractor controllers by admin and it self
 const getAllInstractors = async (req, res) => {
@@ -24,8 +24,7 @@ const currentInstractor = async (req, res) => {
 }
 
 const updateInstractor = async (req, res) => {
-    const { id: instractorId } = req.params
-    const instractor = await Instractor.findByIdAndUpdate({ _id: instractorId }, req.body, {
+    const instractor = await Instractor.findByIdAndUpdate({ _id: req.user.userId }, req.body, {
         new: true,
         runValidators: true,
     });
@@ -38,12 +37,13 @@ const updateInstractor = async (req, res) => {
 };
 
 const delateInstractor = async (req, res) => {
-    const { id: instractorId } = req.params;
-    const instractor = await Instractor.findOne({ _id: instractorId });
-    if (!instractor) {
-        throw new CustomError.NotFoundError(`no instractor with id ${instractorId}`)
+    const { id: userId } = req.params;
+    const user = await Instractor.findOne({ _id: userId });
+    if (!user) {
+        throw new CustomError.NotFoundError(`no instractor with id ${userId}`)
     }
-    await instractor.remove();
+    chechPermissions(req.user, user._id);
+    await user.remove();
     res.status(StatusCodes.OK).json({ msg: 'Instractor delated successfully ' });
 };
 

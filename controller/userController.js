@@ -3,7 +3,7 @@ const { StatusCodes } = require('http-status-codes');
 const CustomError = require('../errors');
 const {
     createTokenUser,
-    attachCookiesToResponse,
+    attachCookiesToResponse, chechPermissions
 } = require('../utils')
 
 const getAllUsers = async (req, res) => {
@@ -25,8 +25,7 @@ const getCurrentUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-    const { id: userId } = req.params
-    const user = await User.findByIdAndUpdate({ _id: userId }, req.body, {
+    const user = await User.findByIdAndUpdate({ _id: req.user.userId }, req.body, {
         new: true,
         runValidators: true,
     });
@@ -53,10 +52,22 @@ const updateUserPassword = async (req, res) => {
     res.status(StatusCodes.CREATED).json({ msg: 'password changed successfully' });
 };
 
+const deleteUser = async (req, res) => {
+    const { id: userId } = req.params;
+    const user = await User.findOne({ _id: userId });
+    if (!user) {
+        throw new CustomError.NotFoundError(`no user with id ${userId}`)
+    }
+    chechPermissions(req.user, user._id);
+    await user.remove();
+    res.status(StatusCodes.OK).json({ msg: 'user delated successfully ' });
+};
+
 module.exports = {
     getAllUsers,
     getCurrentUser,
     getSingleUser,
     updateUser,
-    updateUserPassword
+    updateUserPassword,
+    deleteUser
 }

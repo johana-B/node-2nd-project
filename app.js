@@ -51,6 +51,12 @@ app.use(cors())
 app.use(xss())
 app.use(mongoSanitize());
 
+app.use('/peerjs', peerServer);
+app.use('/users', userRouter);
+app.use('/courses', courseRouter);
+app.use('/instractors', instractorRouter);
+app.use('/auth', authRouter);
+
 app.get('/zoom', (req, res) => {
     res.redirect(`/zoom-${uuidV4()}`)
 })
@@ -71,11 +77,7 @@ io.on('connection', socket => {
     })
 
 })
-app.use('/peerjs', peerServer);
-app.use('/users', userRouter);
-app.use('/courses', courseRouter);
-app.use('/instractors', instractorRouter);
-app.use('/auth', authRouter);
+
 
 //middleware
 app.use(notFound);

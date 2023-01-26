@@ -1,7 +1,9 @@
 const Course = require('../model/courseModel');
 const { StatusCodes } = require('http-status-codes')
 const CustomError = require('../errors')
-const path = require('path')
+const path = require('path');
+const fs = require('fs');
+const { getVideoDurationInSeconds } = require('get-video-duration');
 
 const createCourse = async (req, res) => {
     // started video upload
@@ -30,19 +32,23 @@ const createCourse = async (req, res) => {
     );
     await coursePdf.mv(pdfPath);
     // end pdf upload
-
-    const { courseName, duration, level, description, curriculum, } = req.body;
-    const course = await Course.create({
-        instractor: req.user.userId,
-        courseName,
-        duration,
-        level,
-        description,
-        curriculum,
-        video: `${videoName}`,
-        pdf: `${pdfName}`
-    });
-    res.status(StatusCodes.CREATED).json({ course })
+    getVideoDurationInSeconds(`${videoPath}`).then(async (duration) => {
+        let videoLength = duration / 60;
+        console.log(videoLength);
+        const { courseName, level, description, curriculum, } = req.body;
+        const course = await Course.create({
+            instractor: req.user.userId,
+            courseName,
+            duration: videoLength,
+            level,
+            description,
+            curriculum,
+            video: `/uploads/video/${videoName}`,
+            pdf: `/uploads/pdf/${pdfName}`
+        });
+        res.status(StatusCodes.CREATED).json({ course })
+        return duration
+    })
 };
 
 const getAllCourse = async (req, res) => {
