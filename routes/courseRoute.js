@@ -9,7 +9,7 @@ const {
     getAllCourse,
     getSingleCourse,
     updateCourse,
-    delateCourse,
+    deleteCourse,
 } = require('../controller/courseController');
 
 Router
@@ -21,6 +21,6 @@ Router
     .route('/:id')
     .get(getSingleCourse)
     .patch([authenticateUser, autorizedUser('admin', 'instractor', 'institution')], updateCourse)
-    .delete([authenticateUser, autorizedUser('admin', 'instractor', 'institution')], delateCourse)
+    .delete([authenticateUser, autorizedUser('admin', 'instractor', 'institution')], deleteCourse)
 
 module.exports = Router

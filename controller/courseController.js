@@ -80,7 +80,7 @@ const updateCourse = async (req, res) => {
     res.status(StatusCodes.OK).json({ course, msg: 'course updated successfully' });
 };
 
-const delateCourse = async (req, res) => {
+const deleteCourse = async (req, res) => {
     const { id: courseId } = req.params;
     const course = await Course.findOne({ _id: courseId });
     if (!course) {
@@ -95,5 +95,5 @@ module.exports = {
     getAllCourse,
     getSingleCourse,
     updateCourse,
-    delateCourse,
+    deleteCourse,
 }

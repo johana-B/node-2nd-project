@@ -34,6 +34,7 @@ const createpdf = async (req, res) => {
     const fileName = filename.split(" ").join("-");
     const pdf = new Pdf({
         course: req.body.course,
+        pdfName: req.body.pdfName,
         pdf: `/uploads/${fileName}`,
     })
     await pdf.save()
@@ -48,10 +49,12 @@ const getAllVideos = async (req, res) => {
     res.status(StatusCodes.OK).json({ videos, msg: 'get all video' });
 };
 
-const getSingleVideo = async (req, res) => {
-    const { id: videoId } = req.params;
-    const video = await Video.findById({ _id: videoId })
-    res.status(StatusCodes.OK).json({ video, msg: 'get single video' });
+const getAllPdfs = async (req, res) => {
+    const pdf = await Pdf.find({});
+    if (!pdf) {
+        throw new CustomError.NotFoundError('no pdf');
+    }
+    res.status(StatusCodes.OK).json({ pdf, msg: 'get all video' });
 };
 
 const updateVideo = async (req, res) => {
@@ -65,16 +68,43 @@ const updateVideo = async (req, res) => {
     }
     res.status(StatusCodes.OK).json({ video, msg: 'course updated successfully' });
 };
-
+const updatePdf = async (req, res) => {
+    const { id: pdfId } = req.params
+    const pdf = await Pdf.findByIdAndUpdate({ _id: pdfId }, req.body, {
+        new: true,
+        runValidators: true,
+    });
+    if (!pdf) {
+        throw new CustomError.NotFoundError(`no course with id ${pdfId}`);
+    }
+    res.status(StatusCodes.OK).json({ pdf, msg: 'course updated successfully' });
+};
 const deleteVideo = async (req, res) => {
-    res.status(StatusCodes.OK).json('get all video');
+    const { id: videoId } = req.params;
+    const video = await Video.findOne({ _id: videoId });
+    if (!video) {
+        throw new CustomError.NotFoundError(`no video with id ${videoId}`)
+    }
+    await video.remove();
+    res.status(StatusCodes.OK).json({ msg: 'video delated successfully ' });
+};
+const deletePdf = async (req, res) => {
+    const { id: pdfId } = req.params;
+    const pdf = await Pdf.findOne({ _id: pdfId });
+    if (!pdf) {
+        throw new CustomError.NotFoundError(`no pdf with id ${pdfId}`)
+    }
+    await pdf.remove();
+    res.status(StatusCodes.OK).json({ msg: 'pdf delated successfully ' });
 };
 
 module.exports = {
     getAllVideos,
+    getAllPdfs,
     createVideo,
     createpdf,
-    getSingleVideo,
     updateVideo,
-    deleteVideo
+    updatePdf,
+    deleteVideo,
+    deletePdf
 }

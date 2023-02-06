@@ -1,5 +1,5 @@
 require('dotenv').config();
-//require('express-async-errors')
+require('express-async-errors')
 
 const express = require('express');
 const connectDB = require('./db/connect');
@@ -16,6 +16,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const authRouter = require('./routes/authRoute');
 const userRouter = require('./routes/userRoute');
 const courseRouter = require('./routes/courseRoute');
+const categoryRouter = require('./routes/categoryRoute');
 const instractorRouter = require('./routes/InstractorRoute');
 const fileRouter = require('./routes/fileRoute');
 //middleware
@@ -38,12 +39,11 @@ app.use(express.static('./public'));
 app.use(morgan('tiny'));
 app.use(cookieParser(process.env.JWT_SECRET));
 app.use(express.json());
-// app.use(fileUpload({ createParentPath: true }))
 //security
 app.set('trust proxy', 1)
 app.use(rateLimiter({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 60, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+    max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 }))
@@ -51,15 +51,17 @@ app.use(helmet())
 app.use(cors())
 app.use(xss())
 app.use(mongoSanitize());
-
 app.use('/peerjs', peerServer);
+// main routes
 app.use('/users', userRouter);
+app.use('/category', categoryRouter);
 app.use('/courses', courseRouter);
 app.use('/instractors', instractorRouter);
 app.use('/auth', authRouter);
 app.use('/files', fileRouter);
 
-app.get('/zoom', (req, res) => {
+//zoom
+app.get('/zoom', authenticateUser, (req, res) => {
     res.redirect(`/zoom-${uuidV4()}`)
 })
 app.get('/:room', (req, res) => {
@@ -79,8 +81,6 @@ io.on('connection', socket => {
     })
 
 })
-
-
 //middleware
 app.use(notFound);
 app.use(errorHandlerMiddleware);

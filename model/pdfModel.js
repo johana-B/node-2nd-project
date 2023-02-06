@@ -6,6 +6,10 @@ const PdfSchema = new mongoose.Schema({
         ref: 'course',
         required: true,
     },
+    pdfName: {
+        type: String,
+        required: true
+    },
     pdf: {
         type: String,
         required: true

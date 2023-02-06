@@ -10,13 +10,9 @@ const CourseSchema = mongoose.Schema({
         ref: 'instractor',
         required: true,
     },
-    // lectures: {
-    //     type: [String],
-    //     default: ['lecture-1'],
-    //     required: true,
-    // },
-    duration: {
-        type: Number,
+    category: {
+        type: mongoose.Types.ObjectId,
+        ref: 'category',
         required: true,
     },
     level: {
@@ -31,14 +27,6 @@ const CourseSchema = mongoose.Schema({
     curriculum: {
         type: String,
         required: true,
-    },
-    video: {
-        type: String,
-        default: '/uploads/pdf/picture-1.jpg'
-    },
-    pdf: {
-        type: String,
-        default: '/uploads/pdf/picture-1.jpg'
     },
 }, { timestamps: true });
 
