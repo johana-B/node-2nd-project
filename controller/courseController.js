@@ -43,8 +43,8 @@ const createCourse = async (req, res) => {
             level,
             description,
             curriculum,
-            video: `/uploads/video/${videoName}`,
-            pdf: `/uploads/pdf/${pdfName}`
+            video: `/uploads/${videoName}`,
+            pdf: `/uploads/${pdfName}`
         });
         res.status(StatusCodes.CREATED).json({ course })
         return duration

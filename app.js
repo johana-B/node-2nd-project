@@ -1,11 +1,11 @@
 require('dotenv').config();
-require('express-async-errors')
+//require('express-async-errors')
 
 const express = require('express');
 const connectDB = require('./db/connect');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
-const fileUpload = require('express-fileupload');
+
 //security packages
 const helmet = require('helmet');
 const cors = require('cors');
@@ -17,6 +17,7 @@ const authRouter = require('./routes/authRoute');
 const userRouter = require('./routes/userRoute');
 const courseRouter = require('./routes/courseRoute');
 const instractorRouter = require('./routes/InstractorRoute');
+const fileRouter = require('./routes/fileRoute');
 //middleware
 const notFound = require('./middleware/notfound')
 const errorHandlerMiddleware = require('./middleware/error-handler')
@@ -37,7 +38,7 @@ app.use(express.static('./public'));
 app.use(morgan('tiny'));
 app.use(cookieParser(process.env.JWT_SECRET));
 app.use(express.json());
-app.use(fileUpload({ createParentPath: true }))
+// app.use(fileUpload({ createParentPath: true }))
 //security
 app.set('trust proxy', 1)
 app.use(rateLimiter({
@@ -56,6 +57,7 @@ app.use('/users', userRouter);
 app.use('/courses', courseRouter);
 app.use('/instractors', instractorRouter);
 app.use('/auth', authRouter);
+app.use('/files', fileRouter);
 
 app.get('/zoom', (req, res) => {
     res.redirect(`/zoom-${uuidV4()}`)

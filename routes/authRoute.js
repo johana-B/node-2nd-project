@@ -1,5 +1,6 @@
 const express = require('express');
 const Router = express.Router();
+const { uploadOptions } = require('../middleware/multer')
 
 const {
     register,
@@ -15,7 +16,7 @@ Router
     .post(register);
 Router
     .route('/createInstractor')
-    .post([authenticateUser, autorizedUser('admin')], createInstractor);
+    .post([authenticateUser, autorizedUser('admin')], uploadOptions.single("image"), createInstractor);
 Router
     .route('/login')
     .post(login);

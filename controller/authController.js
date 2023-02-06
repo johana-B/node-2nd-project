@@ -27,19 +27,8 @@ const register = async (req, res) => {
 }
 
 const createInstractor = async (req, res) => {
-    const ext = path.extname(req.files.image.name);
-    const instractorImage = req.files.image
-    if (!instractorImage.mimetype.startsWith('image')) {
-        throw new CustomError.BadRequest('Please Upload Image');
-    }
-    const val = Date.now().toString()
-    const imageName = req.body.firstName + val + ext;
-    const fileName = imageName.split(' ').join('-')
-    const imagePath = path.join(
-        __dirname,
-        '../public/uploads/' + fileName
-    );
-    await instractorImage.mv(imagePath);
+    const fileName = req.file.filename;
+
     let instractor = new Instractor({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
