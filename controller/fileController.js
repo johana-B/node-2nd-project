@@ -17,9 +17,10 @@ const createVideo = async (req, res) => {
         const video = new Video({
             videoName: req.body.videoName,
             course: req.body.course,
-            video: `/uploads/${fileName}`,
             duration: videoLength,
-        })
+            video: `/uploads/${fileName}`,
+
+        });
         await video.save()
         res.status(StatusCodes.CREATED).json({ video });
     })
@@ -42,19 +43,25 @@ const createpdf = async (req, res) => {
 }
 
 const getAllVideos = async (req, res) => {
-    const videos = await Video.find({});
+    const videos = await Video.find({}).populate({
+        path: 'course',
+        select: 'courseName'
+    });
     if (!videos) {
         throw new CustomError.NotFoundError('no videos');
     }
-    res.status(StatusCodes.OK).json({ videos, msg: 'get all video' });
+    res.status(StatusCodes.OK).json({ videos, nbHits: videos.length });
 };
 
 const getAllPdfs = async (req, res) => {
-    const pdf = await Pdf.find({});
+    const pdf = await Pdf.find({}).populate({
+        path: 'course',
+        select: 'courseName'
+    });
     if (!pdf) {
         throw new CustomError.NotFoundError('no pdf');
     }
-    res.status(StatusCodes.OK).json({ pdf, msg: 'get all video' });
+    res.status(StatusCodes.OK).json({ pdf, nbHits: pdf.length });
 };
 
 const updateVideo = async (req, res) => {
@@ -64,9 +71,9 @@ const updateVideo = async (req, res) => {
         runValidators: true,
     });
     if (!video) {
-        throw new CustomError.NotFoundError(`no course with id ${videoId}`);
+        throw new CustomError.NotFoundError(`no video with id ${videoId}`);
     }
-    res.status(StatusCodes.OK).json({ video, msg: 'course updated successfully' });
+    res.status(StatusCodes.OK).json({ video, msg: 'video updated successfully' });
 };
 const updatePdf = async (req, res) => {
     const { id: pdfId } = req.params
@@ -75,9 +82,9 @@ const updatePdf = async (req, res) => {
         runValidators: true,
     });
     if (!pdf) {
-        throw new CustomError.NotFoundError(`no course with id ${pdfId}`);
+        throw new CustomError.NotFoundError(`no pdf with id ${pdfId}`);
     }
-    res.status(StatusCodes.OK).json({ pdf, msg: 'course updated successfully' });
+    res.status(StatusCodes.OK).json({ pdf, msg: 'pdf updated successfully' });
 };
 const deleteVideo = async (req, res) => {
     const { id: videoId } = req.params;

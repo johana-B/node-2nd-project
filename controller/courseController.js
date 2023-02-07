@@ -2,59 +2,27 @@ const Course = require('../model/courseModel');
 const { StatusCodes } = require('http-status-codes')
 const CustomError = require('../errors')
 const path = require('path');
-const fs = require('fs');
-const { getVideoDurationInSeconds } = require('get-video-duration');
 
 const createCourse = async (req, res) => {
-    // started video upload
-    if (!req.files) {
-        throw new CustomError.BadRequest('No File Uploaded');
-    }
-    const ext = path.extname(req.files.video.name);
-    const courseVideo = req.files.video;
-    if (!courseVideo.mimetype.startsWith('video')) {
-        throw new CustomError.BadRequest('Please Upload video');
-    }
-    const videoName = req.body.courseName + ext
-    const videoPath = path.join(
-        __dirname,
-        '../public/uploads/video/' + `${videoName}`
-    );
-    await courseVideo.mv(videoPath);
-    //end video upload
-    //start pdf upload
-    const pExt = path.extname(req.files.pdf.name);
-    const coursePdf = req.files.pdf;
-    const pdfName = req.body.courseName + pExt;
-    const pdfPath = path.join(
-        __dirname,
-        '../public/uploads/pdf/' + pdfName
-    );
-    await coursePdf.mv(pdfPath);
-    // end pdf upload
-    getVideoDurationInSeconds(`${videoPath}`).then(async (duration) => {
-        let videoLength = duration / 60;
-        console.log(videoLength);
-        const { courseName, level, description, curriculum, } = req.body;
-        const course = await Course.create({
-            instractor: req.user.userId,
-            courseName,
-            duration: videoLength,
-            level,
-            description,
-            curriculum,
-            video: `/uploads/${videoName}`,
-            pdf: `/uploads/${pdfName}`
-        });
-        res.status(StatusCodes.CREATED).json({ course })
-        return duration
-    })
-};
+    const { courseName, level, description, curriculum, category } = req.body;
+    const course = await Course.create({
+        instractor: req.user.userId,
+        courseName,
+        category,
+        level,
+        description,
+        curriculum,
+    });
+    res.status(StatusCodes.CREATED).json({ course })
+}
 
 const getAllCourse = async (req, res) => {
     const course = await Course.find({}).populate({
         path: 'instractor',
         select: 'firstName email'
+    }).populate({
+        path: 'category',
+        select: 'name'
     });
     res.status(StatusCodes.OK).json({ course });
 };

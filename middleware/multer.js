@@ -6,8 +6,8 @@ let storage = multer.diskStorage({
         cb(null, "public/uploads");
     },
     filename: function (req, file, cb) {
-        const fileName = file.originalname;
-        cb(null, Date.now() + "-" + fileName);
+        const fileName = file.originalname.split(" ").join("-");;
+        cb(null, Date.now() + '-' + fileName);
     },
 });
 const uploadOptions = multer({ storage });
