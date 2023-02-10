@@ -36,6 +36,12 @@ const getSingleCourse = async (req, res) => {
     res.status(StatusCodes.OK).json({ course });
 };
 
+const getInstractorCourse = async (req, res) => {
+    const course = await Course.find({ instractor: req.user.userId });
+    res.status(StatusCodes.OK).json({ course });
+
+}
+
 const updateCourse = async (req, res) => {
     const { id: courseId } = req.params
     const course = await Course.findByIdAndUpdate({ _id: courseId }, req.body, {
@@ -64,4 +70,5 @@ module.exports = {
     getSingleCourse,
     updateCourse,
     deleteCourse,
+    getInstractorCourse
 }

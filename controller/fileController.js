@@ -6,9 +6,10 @@ const CustomError = require('../errors');
 const { getVideoDurationInSeconds } = require('get-video-duration');
 
 const createVideo = async (req, res) => {
-    const course = await Course.findById(req.body.course);
+    const { id: courseId } = req.params;
+    const course = await Course.findById({ _id: courseId });
     if (!course) {
-        throw new CustomError.BadRequest('invalid course');
+        throw new CustomError.NotFoundError(`no course with id ${courseId}`);
     }
     const filename = req.file.filename;
     const fileName = filename.split(" ").join("-");
@@ -27,9 +28,10 @@ const createVideo = async (req, res) => {
 }
 
 const createpdf = async (req, res) => {
-    const course = await Course.findById(req.body.course);
+    const { id: courseId } = req.params;
+    const course = await Course.findById({ _id: courseId });
     if (!course) {
-        throw new CustomError.BadRequest('invalid course');
+        throw new CustomError.NotFoundError(`no course with id ${courseId}`);
     }
     const filename = req.file.filename;
     const fileName = filename.split(" ").join("-");

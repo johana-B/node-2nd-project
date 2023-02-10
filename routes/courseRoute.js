@@ -10,12 +10,17 @@ const {
     getSingleCourse,
     updateCourse,
     deleteCourse,
+    getInstractorCourse
 } = require('../controller/courseController');
 
 Router
     .route('/')
     .get(getAllCourse)
     .post([authenticateUser, autorizedUser('instractor')], createCourse,)
+
+Router
+    .route('/myCourse')
+    .get([authenticateUser], getInstractorCourse)
 
 Router
     .route('/:id')
