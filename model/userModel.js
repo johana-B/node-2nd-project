@@ -29,15 +29,15 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    age: {
-        type: Number,
-        required: true,
-    },
-    gender: {
-        type: String,
-        enum: ['male', 'female'],
-        required: true,
-    },
+    // age: {
+    //     type: Number,
+    //     required: true,
+    // },
+    // gender: {
+    //     type: String,
+    //     enum: ['male', 'female'],
+    //     required: true,
+    // },
     role: {
         type: String,
         enum: ['admin', 'user', 'institution', 'instractor'],

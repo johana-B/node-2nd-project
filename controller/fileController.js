@@ -6,11 +6,10 @@ const CustomError = require('../errors');
 const { getVideoDurationInSeconds } = require('get-video-duration');
 
 const createVideo = async (req, res) => {
-    const { id: courseId } = req.params;
-    const course = await Course.findById({ _id: courseId });
+    const course = await Course.findById(req.body.course);
     if (!course) {
-        throw new CustomError.NotFoundError(`no course with id ${courseId}`);
-    }
+        throw new CustomError.NotFoundError(`no course with id ${req.body.course}`);
+    };
     const filename = req.file.filename;
     const fileName = filename.split(" ").join("-");
     getVideoDurationInSeconds(`public/uploads/${fileName}`).then(async (duration) => {
@@ -28,10 +27,9 @@ const createVideo = async (req, res) => {
 }
 
 const createpdf = async (req, res) => {
-    const { id: courseId } = req.params;
-    const course = await Course.findById({ _id: courseId });
+    const course = await Course.findById(req.body.course);
     if (!course) {
-        throw new CustomError.NotFoundError(`no course with id ${courseId}`);
+        throw new CustomError.NotFoundError(`no course with id ${req.body.course}`);
     }
     const filename = req.file.filename;
     const fileName = filename.split(" ").join("-");
@@ -52,7 +50,7 @@ const getAllVideos = async (req, res) => {
     if (!videos) {
         throw new CustomError.NotFoundError('no videos');
     }
-    res.status(StatusCodes.OK).json({ videos, nbHits: videos.length });
+    res.status(StatusCodes.OK).json(videos);
 };
 
 const getAllPdfs = async (req, res) => {
@@ -63,7 +61,7 @@ const getAllPdfs = async (req, res) => {
     if (!pdf) {
         throw new CustomError.NotFoundError('no pdf');
     }
-    res.status(StatusCodes.OK).json({ pdf, nbHits: pdf.length });
+    res.status(StatusCodes.OK).json(pdf);
 };
 
 const updateVideo = async (req, res) => {
@@ -90,20 +88,40 @@ const updatePdf = async (req, res) => {
 };
 const deleteVideo = async (req, res) => {
     const { id: videoId } = req.params;
-    const video = await Video.findOne({ _id: videoId });
-    if (!video) {
+    const videos = await Video.findOne({ _id: videoId });
+    if (!videos) {
         throw new CustomError.NotFoundError(`no video with id ${videoId}`)
     }
-    await video.remove();
+    const videoResponse = videos.video
+    // console.log(videoResponse)
+    videoToDelete = videoResponse.replace('/uploads/', "public/uploads/");
+    // console.log('leylgn eziga');
+    console.log(videoToDelete);
+    if (fs.existsSync(videoToDelete)) {
+        // console.log('gebtual')
+        fs.unlinkSync(`${videoToDelete}`)
+        // console.log("delchewalew man");
+    }
+    await videos.remove();
     res.status(StatusCodes.OK).json({ msg: 'video delated successfully ' });
 };
 const deletePdf = async (req, res) => {
     const { id: pdfId } = req.params;
-    const pdf = await Pdf.findOne({ _id: pdfId });
-    if (!pdf) {
+    const pdfs = await Pdf.findOne({ _id: pdfId });
+    if (!pdfs) {
         throw new CustomError.NotFoundError(`no pdf with id ${pdfId}`)
     }
-    await pdf.remove();
+    const pdfResponse = pdfs.pdf
+    // console.log(pdfResponse)
+    pdfToDelete = pdfResponse.replace('/uploads/', "public/uploads/");
+    // console.log('leylgn eziga');
+    console.log(pdfToDelete);
+    if (fs.existsSync(pdfToDelete)) {
+        // console.log('gebtual')
+        fs.unlinkSync(`${pdfToDelete}`)
+        // console.log("delchewalew man");
+    }
+    await pdfs.remove();
     res.status(StatusCodes.OK).json({ msg: 'pdf delated successfully ' });
 };
 

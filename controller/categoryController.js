@@ -9,7 +9,7 @@ const getAllCategory = async (req, res) => {
     if (!catagory) {
         throw new CustomError.NotFoundError(`there is no category `);
     }
-    res.status(StatusCodes.OK).json({ catagory, nbHits: catagory.length })
+    res.status(StatusCodes.OK).json(catagory)
 
 }
 
@@ -19,7 +19,7 @@ const getSingleCategory = async (req, res) => {
     if (!category) {
         throw new CustomError.NotFoundError(`no category with id${categoryID}`);
     }
-    res.status(201).json({ category })
+    res.status(201).json(category)
 }
 
 const createCategory = async (req, res) => {

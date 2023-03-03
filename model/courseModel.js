@@ -28,6 +28,10 @@ const CourseSchema = mongoose.Schema({
         type: String,
         required: true,
     },
+    image: {
+        type: String,
+        required: true,
+    },
 }, { timestamps: true });
 
 const courseSchema = mongoose.model('course', CourseSchema);

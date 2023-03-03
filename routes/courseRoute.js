@@ -3,7 +3,7 @@ const express = require('express')
 const Router = express.Router()
 
 const { authenticateUser, autorizedUser } = require('../middleware/authentication')
-
+const { uploadOptions } = require('../middleware/multer')
 const {
     createCourse,
     getAllCourse,
@@ -16,7 +16,7 @@ const {
 Router
     .route('/')
     .get(getAllCourse)
-    .post([authenticateUser, autorizedUser('instractor')], createCourse,)
+    .post([authenticateUser, autorizedUser('instractor')], uploadOptions.single("image"), createCourse,)
 
 Router
     .route('/myCourse')

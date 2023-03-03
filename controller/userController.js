@@ -9,7 +9,7 @@ const {
 const getAllUsers = async (req, res) => {
     console.log(req.user);
     const users = await User.find({ role: 'user' }).select('-password');
-    res.status(StatusCodes.OK).json({ users, count: users.length });
+    res.status(StatusCodes.OK).json(users);
 };
 
 const getSingleUser = async (req, res) => {
@@ -18,7 +18,7 @@ const getSingleUser = async (req, res) => {
     if (!user) {
         throw new CustomError.NotFoundError(`No user with id : ${userId}`);
     }
-    res.status(StatusCodes.OK).json({ user });
+    res.status(StatusCodes.OK).json(user);
 };
 const getCurrentUser = async (req, res) => {
     res.status(StatusCodes.OK).json({ user: req.user });
@@ -30,7 +30,7 @@ const updateUser = async (req, res) => {
         runValidators: true,
     });
     if (!user) {
-        throw new CustomError.NotFoundError(`no user with id ${userId}`);
+        throw new CustomError.NotFoundError(`no user with id ${_id}`);
     }
     const tokenUser = createTokenUser(user);
     attachCookiesToResponse({ res, user: tokenUser });

@@ -16,7 +16,7 @@ const {
 
 Router.route('/video')
     .get(getAllVideos)
-    .post([authenticateUser, autorizedUser('admin', 'instractor')],
+    .post([authenticateUser, autorizedUser('instractor')],
         uploadOptions.single("video"), createVideo);
 
 Router.route('/pdf')
