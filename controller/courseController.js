@@ -27,11 +27,11 @@ const createCourse = async (req, res) => {
 const getAllCourse = async (req, res) => {
     const course = await Course.find({}).populate({
         path: 'instractor',
-        select: 'firstName email lastName'
+        select: 'firstName lastName email'
     }).populate({
         path: 'category',
         select: 'name'
-    });
+    }).sort({ createdAt: -1 });
 
     res.status(StatusCodes.OK).json(course);
 };
@@ -41,7 +41,7 @@ const getSingleCourse = async (req, res) => {
     console.log(courseId);
     const course = await Course.findById({ _id: courseId }).populate({
         path: 'instractor',
-        select: 'firstName email'
+        select: 'firstName lastName email'
     }).populate({
         path: 'category',
         select: 'name'

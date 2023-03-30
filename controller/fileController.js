@@ -17,7 +17,7 @@ const createVideo = async (req, res) => {
         const video = new Video({
             videoName: req.body.videoName,
             course: req.body.course,
-            duration: videoLength,
+            duration: parseFloat(videoLength).toFixed(2),
             video: `/uploads/${fileName}`,
 
         });

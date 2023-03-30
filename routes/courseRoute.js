@@ -16,11 +16,11 @@ const {
 Router
     .route('/')
     .get(getAllCourse)
-    .post([authenticateUser, autorizedUser('instractor')], uploadOptions.single("image"), createCourse,)
+    .post([authenticateUser, autorizedUser('instractor')], uploadOptions.single("image"), createCourse)
 
 Router
     .route('/myCourse')
-    .get([authenticateUser], getInstractorCourse)
+    .get(authenticateUser, getInstractorCourse)
 
 Router
     .route('/:id')
