@@ -14,7 +14,7 @@ const createVideo = async (req, res) => {
     console.log('first')
     const upload = await cloudinary.uploader.upload(req.file.path, { resource_type:"video",folder:"folder1"});
     console.log(upload);
-    getVideoDurationInSeconds(upload.secure_url).then(async (duration) => {
+    getVideoDurationInSeconds(req.file.path).then(async (duration) => {
         let videoLength = duration / 60;
         const video = new Video({
             videoName: req.body.videoName,
