@@ -2,8 +2,7 @@ const User = require('../model/userModel');
 const { StatusCodes } = require('http-status-codes');
 const CustomError = require('../errors');
 const {
-    createTokenUser,
-    attachCookiesToResponse, chechPermissions
+    createTokenUser, chechPermissions
 } = require('../utils')
 
 const getAllUsers = async (req, res) => {

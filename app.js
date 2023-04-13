@@ -1,6 +1,6 @@
 require('dotenv').config();
 require('express-async-errors')
-
+const path = require('path')
 const express = require('express');
 const connectDB = require('./db/connect');
 const morgan = require('morgan');
@@ -34,8 +34,8 @@ const peerServer = ExpressPeerServer(server, {
     debug: true,
 });
 
-
-app.use(express.static('./public'));
+app.use(express.static(path.join(__dirname, '/public')))
+// app.use(express.static('public'));
 app.use(morgan('tiny'));
 app.use(cookieParser(process.env.JWT_SECRET));
 app.use(express.json());
@@ -49,7 +49,7 @@ app.use(rateLimiter({
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 }))
 app.use(helmet())
-app.use(cors())
+app.use(cors({ credentials: true, origin: "*" }))
 app.use(xss())
 app.use(mongoSanitize());
 app.use('/peerjs', peerServer);

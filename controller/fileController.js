@@ -4,28 +4,29 @@ const Course = require('../model/courseModel');
 const { StatusCodes } = require('http-status-codes');
 const CustomError = require('../errors');
 const { getVideoDurationInSeconds } = require('get-video-duration');
+const { cloudinary } = require("../middleware/multer")
 
 const createVideo = async (req, res) => {
     const course = await Course.findById(req.body.course);
     if (!course) {
         throw new CustomError.NotFoundError(`no course with id ${req.body.course}`);
     };
-    const filename = req.file.filename;
-    const fileName = filename.split(" ").join("-");
-    getVideoDurationInSeconds(`public/uploads/${fileName}`).then(async (duration) => {
+    console.log('first')
+    const upload = await cloudinary.uploader.upload(req.file.path, { resource_type:"video",folder:"folder1"});
+    console.log(upload);
+    getVideoDurationInSeconds(upload.secure_url).then(async (duration) => {
         let videoLength = duration / 60;
         const video = new Video({
             videoName: req.body.videoName,
             course: req.body.course,
             duration: parseFloat(videoLength).toFixed(2),
-            video: `/uploads/${fileName}`,
+            video: upload.secure_url,
 
         });
         await video.save()
-        res.status(StatusCodes.CREATED).json({ video });
+        res.status(StatusCodes.CREATED).json({ video, msg: "video created successfully" });
     })
-}
-
+    }
 const createpdf = async (req, res) => {
     const course = await Course.findById(req.body.course);
     if (!course) {
@@ -39,7 +40,7 @@ const createpdf = async (req, res) => {
         pdf: `/uploads/${fileName}`,
     })
     await pdf.save()
-    res.status(StatusCodes.CREATED).json({ pdf });
+    res.status(StatusCodes.CREATED).json({ pdf, mag: "pdf created successfully" });
 }
 
 const getAllVideos = async (req, res) => {

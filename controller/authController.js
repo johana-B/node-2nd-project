@@ -3,7 +3,7 @@ const Instractor = require('../model/instructorModel')
 const { StatusCodes } = require('http-status-codes');
 const CustomError = require('../errors');
 const path = require('path');
-const { attachCookiesToResponse, createTokenUser } = require('../utils');
+const { createTokenUser } = require('../utils');
 
 const register = async (req, res) => {
     const { firstName, lastName, email, password, phoneNumber, age, gender } = req.body
@@ -22,13 +22,13 @@ const register = async (req, res) => {
             role
         })
     const tokenUser = createTokenUser(user);
-    attachCookiesToResponse({ res, user: tokenUser });
-    res.status(StatusCodes.CREATED).json({ user: tokenUser });
+    const token = user.createJWT({ payload: tokenUser })
+    // attachCookiesToResponse({ res, user: tokenUser });
+    res.status(StatusCodes.CREATED).json({ user: tokenUser, token });
 }
 
 const createInstractor = async (req, res) => {
-    const fileName = req.file.filename;
-
+    const upload = await cloudinary.uploader.upload(req.file.path, { resource_type:"image",folder:"images"});
     let instractor = new Instractor({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
@@ -40,12 +40,12 @@ const createInstractor = async (req, res) => {
         experience: req.body.experience,
         age: req.body.age,
         gender: req.body.gender,
-        image: `/uploads/${fileName}`
+        image:upload.secure_url
     })
 
     const instractors = await instractor.save()
     const tokenUser = createTokenUser(instractors);
-    res.status(StatusCodes.CREATED).json({ instractor: tokenUser });
+    res.status(StatusCodes.CREATED).json({ instractor: tokenUser, msg: "instractor created successfully" });
 };
 
 const instractorLogin = async (req, res) => {
@@ -53,6 +53,7 @@ const instractorLogin = async (req, res) => {
     if (!email || !password) {
         throw new CustomError.BadRequest('email and password can not be empty');
     };
+
     const user = await Instractor.findOne({ email })
     if (!user) {
         throw new CustomError.NotFoundError('invalid crediential');
@@ -62,8 +63,8 @@ const instractorLogin = async (req, res) => {
         throw new CustomError.NotFoundError('invalid credential');
     };
     const tokenUser = createTokenUser(user);
-    attachCookiesToResponse({ res, user: tokenUser });
-    res.status(StatusCodes.CREATED).json({ instractor: tokenUser });
+    const token = user.createJWT(tokenUser)
+    res.status(StatusCodes.CREATED).json({ instractor: tokenUser, token });
 };
 
 const login = async (req, res) => {
@@ -80,15 +81,9 @@ const login = async (req, res) => {
         throw new CustomError.NotFoundError('invalid credential');
     };
     const tokenUser = createTokenUser(user);
-    attachCookiesToResponse({ res, user: tokenUser });
-    res.status(StatusCodes.CREATED).json({ user: tokenUser });
-};
-const logout = async (req, res) => {
-    res.cookie('token', 'logout', {
-        httpOnly: true,
-        expires: new Date(Date.now())
-    });
-    res.status(StatusCodes.OK).json('user logged out!');
+    const token = user.createJWT(tokenUser)
+    // attachCookiesToResponse({ res, user: tokenUser });
+    res.status(StatusCodes.CREATED).json({ user: tokenUser, token });
 };
 
 
@@ -96,7 +91,6 @@ module.exports = {
     register,
     createInstractor,
     login,
-    instractorLogin,
-    logout
+    instractorLogin
 
 }

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
-
+const jwt = require('jsonwebtoken');
 
 const InstractorSchema = new mongoose.Schema({
     firstName: {
@@ -68,6 +68,13 @@ const InstractorSchema = new mongoose.Schema({
         default: 'instractor'
     },
 }, { timestamps: true });
+
+InstractorSchema.methods.createJWT = (payload) => {
+    console.log(payload)
+    const token = jwt.sign(payload, process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_LIFETIME });
+    return token;
+};
 
 InstractorSchema.pre('save', async function () {
     if (!this.isModified('password')) return

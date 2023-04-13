@@ -7,7 +7,6 @@ const {
     createInstractor,
     login,
     instractorLogin,
-    logout
 } = require('../controller/authController');
 const { authenticateUser, autorizedUser } = require('../middleware/authentication');
 
@@ -20,9 +19,6 @@ Router
 Router
     .route('/login')
     .post(login);
-Router
-    .route('/logout')
-    .get(logout);
 Router
     .route('/instractorLogin')
     .post(instractorLogin);

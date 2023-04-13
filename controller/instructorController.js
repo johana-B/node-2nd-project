@@ -41,18 +41,18 @@ const delateInstractor = async (req, res) => {
     if (!user) {
         throw new CustomError.NotFoundError(`no instractor with id ${userId}`)
     }
-    const imageResponse = user.image
-    console.log(imageResponse)
-    imageToDelete = imageResponse.replace('/uploads/', "public/uploads/");
-    console.log('leylgn eziga');
-    console.log(imageToDelete);
-    if (fs.existsSync(imageToDelete)) {
-        console.log('gebtual')
-        fs.unlinkSync(`${imageToDelete}`)
-        console.log("delchewalew man");
-    }
+    // const imageResponse = user.image
+    // console.log(imageResponse)
+    // imageToDelete = imageResponse.replace('/uploads/', "public/uploads/");
+    // console.log('leylgn eziga');
+    // console.log(imageToDelete);
+    // if (fs.existsSync(imageToDelete)) {
+    //     console.log('gebtual')
+    //     fs.unlinkSync(`${imageToDelete}`)
+    //     console.log("delchewalew man");
+    // }
     chechPermissions(req.user, user._id);
-    // await user.remove();
+    await user.remove();
     res.status(StatusCodes.OK).json({ msg: 'Instractor delated successfully ' });
 };
 

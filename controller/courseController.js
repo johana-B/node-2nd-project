@@ -10,8 +10,7 @@ const createCourse = async (req, res) => {
     if (!category) {
         throw new CustomError.NotFoundError(`no category with id ${req.body.category}`);
     }
-    const fileName = req.file.filename;
-
+    const upload = await cloudinary.uploader.upload(req.file.path, { resource_type:"image",folder:"images"});
     const course = await Course.create({
         instractor: req.user.userId,
         courseName: req.body.courseName,
@@ -19,7 +18,7 @@ const createCourse = async (req, res) => {
         level: req.body.level,
         description: req.body.description,
         curriculum: req.body.curriculum,
-        image: `/uploads/${fileName}`,
+        image: upload.secure_url,
     });
     res.status(StatusCodes.CREATED).json({ course, msg: 'course created successfully' })
 }
@@ -76,16 +75,16 @@ const deleteCourse = async (req, res) => {
     if (!course) {
         throw new CustomError.NotFoundError(`no course with id ${courseId}`)
     }
-    const imageResponse = course.image
-    // console.log(imageResponse)
-    imageToDelete = imageResponse.replace('/uploads/', "public/uploads/");
-    // console.log('leylgn eziga');
-    console.log(imageToDelete);
-    if (fs.existsSync(imageToDelete)) {
-        // console.log('gebtual')
-        fs.unlinkSync(`${imageToDelete}`)
-        // console.log("delchewalew man");
-    }
+    // const imageResponse = course.image
+    // // console.log(imageResponse)
+    // imageToDelete = imageResponse.replace('/uploads/', "public/uploads/");
+    // // console.log('leylgn eziga');
+    // console.log(imageToDelete);
+    // if (fs.existsSync(imageToDelete)) {
+    //     // console.log('gebtual')
+    //     fs.unlinkSync(`${imageToDelete}`)
+    //     // console.log("delchewalew man");
+    // }
     await course.remove();
     res.status(StatusCodes.OK).json({ msg: 'course delated successfully ' });
 };
